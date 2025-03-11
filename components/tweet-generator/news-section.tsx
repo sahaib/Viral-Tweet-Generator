@@ -21,7 +21,9 @@ const NewsSection: React.FC<NewsSectionProps> = ({ onSelectTopic }) => {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null);
+  const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(
+    null,
+  );
 
   const fetchNews = async () => {
     setIsLoading(true);
@@ -29,12 +31,13 @@ const NewsSection: React.FC<NewsSectionProps> = ({ onSelectTopic }) => {
 
     try {
       const response = await fetch("/api/get-news");
-      
+
       if (!response.ok) {
         throw new Error("Failed to fetch news");
       }
 
       const data = await response.json();
+
       setNews(data.articles || []);
     } catch (err) {
       setError("Failed to load news. Please try again.");
@@ -50,6 +53,7 @@ const NewsSection: React.FC<NewsSectionProps> = ({ onSelectTopic }) => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
+
     return date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -59,7 +63,7 @@ const NewsSection: React.FC<NewsSectionProps> = ({ onSelectTopic }) => {
   const handleUseTopic = (title: string, index: number) => {
     onSelectTopic(title);
     setSelectedItemIndex(index);
-    
+
     // Reset the selected item after a delay
     setTimeout(() => {
       setSelectedItemIndex(null);
@@ -71,23 +75,23 @@ const NewsSection: React.FC<NewsSectionProps> = ({ onSelectTopic }) => {
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold">Latest Tech News</h2>
         <Button
+          color="primary"
+          isLoading={isLoading}
           size="sm"
           variant="flat"
-          color="primary"
           onClick={fetchNews}
-          isLoading={isLoading}
         >
           Refresh
         </Button>
       </div>
-      
+
       <p className="text-default-500 text-sm">
         Find inspiration from the latest tech news
       </p>
 
       {isLoading && (
         <div className="flex justify-center items-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
         </div>
       )}
 
@@ -108,8 +112,8 @@ const NewsSection: React.FC<NewsSectionProps> = ({ onSelectTopic }) => {
           <div
             key={index}
             className={`flex flex-col gap-1 p-3 rounded-lg border ${
-              selectedItemIndex === index 
-                ? "border-success bg-success-50" 
+              selectedItemIndex === index
+                ? "border-success bg-success-50"
                 : "border-default-100 hover:bg-default-50"
             } transition-colors`}
           >
@@ -118,19 +122,19 @@ const NewsSection: React.FC<NewsSectionProps> = ({ onSelectTopic }) => {
                 {item.source.name} • {formatDate(item.publishedAt)}
               </span>
               <Button
+                className="px-2 py-1 h-auto min-w-0"
+                color={selectedItemIndex === index ? "success" : "secondary"}
                 size="sm"
                 variant="light"
-                color={selectedItemIndex === index ? "success" : "secondary"}
                 onClick={() => handleUseTopic(item.title, index)}
-                className="px-2 py-1 h-auto min-w-0"
               >
                 {selectedItemIndex === index ? "Used" : "Use"}
               </Button>
             </div>
             <Link
-              href={item.url}
               isExternal
               className="text-sm font-medium hover:text-primary transition-colors line-clamp-2"
+              href={item.url}
             >
               {item.title}
             </Link>
@@ -141,4 +145,4 @@ const NewsSection: React.FC<NewsSectionProps> = ({ onSelectTopic }) => {
   );
 };
 
-export default NewsSection; 
+export default NewsSection;

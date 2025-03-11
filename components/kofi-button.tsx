@@ -2,7 +2,13 @@
 
 import React, { useState } from "react";
 import { Button } from "@heroui/button";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from "@heroui/modal";
 import { HeartHandshake } from "lucide-react";
 
 interface KofiButtonProps {
@@ -18,29 +24,36 @@ export const KofiButton: React.FC<KofiButtonProps> = ({ username }) => {
   return (
     <>
       <Button
+        className="text-sm font-normal"
         color="primary"
+        startContent={<HeartHandshake size={18} />}
         variant="flat"
         onClick={handleOpen}
-        className="text-sm font-normal"
-        startContent={<HeartHandshake size={18} />}
       >
         Support
       </Button>
 
-      <Modal 
-        isOpen={isOpen} 
-        onClose={handleClose} 
-        size="3xl"
+      <Modal
+        isOpen={isOpen}
         scrollBehavior="inside"
+        size="3xl"
+        onClose={handleClose}
       >
         <ModalContent>
-          <ModalHeader className="flex flex-col gap-1">Support this project</ModalHeader>
+          <ModalHeader className="flex flex-col gap-1">
+            Support this project
+          </ModalHeader>
           <ModalBody className="p-0">
-            <iframe 
-              id="kofiframe" 
-              src={`https://ko-fi.com/${username}/?hidefeed=true&widget=true&embed=true&preview=true`} 
-              style={{ border: 'none', width: '100%', padding: '4px', background: '#f9f9f9' }} 
-              height="712" 
+            <iframe
+              height="712"
+              id="kofiframe"
+              src={`https://ko-fi.com/${username}/?hidefeed=true&widget=true&embed=true&preview=true`}
+              style={{
+                border: "none",
+                width: "100%",
+                padding: "4px",
+                background: "#f9f9f9",
+              }}
               title={username}
             />
           </ModalBody>
@@ -55,4 +68,4 @@ export const KofiButton: React.FC<KofiButtonProps> = ({ username }) => {
   );
 };
 
-export default KofiButton; 
+export default KofiButton;

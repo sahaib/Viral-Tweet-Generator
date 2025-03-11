@@ -9,18 +9,15 @@ export async function GET(request: NextRequest) {
       "https://viral-tweet-generator.vercel.app",
       process.env.NEXT_PUBLIC_APP_URL,
     ].filter(Boolean);
-    
+
     const isAllowedOrigin = !origin || allowedOrigins.includes(origin);
-    
+
     if (!isAllowedOrigin) {
-      return NextResponse.json(
-        { error: "Not allowed" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Not allowed" }, { status: 403 });
     }
 
     const NEWS_API_KEY = process.env.NEWS_API_KEY;
-    
+
     if (!NEWS_API_KEY) {
       throw new Error("NEWS_API_KEY is not defined");
     }
@@ -33,7 +30,7 @@ export async function GET(request: NextRequest) {
           "Content-Type": "application/json",
         },
         next: { revalidate: 3600 }, // Cache for 1 hour
-      }
+      },
     );
 
     if (!response.ok) {
@@ -44,6 +41,7 @@ export async function GET(request: NextRequest) {
 
     // Set CORS headers
     const headers = new Headers();
+
     if (origin && isAllowedOrigin) {
       headers.set("Access-Control-Allow-Origin", origin);
     }
@@ -54,7 +52,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data, { headers });
   } catch (error) {
     console.error("Error fetching news:", error);
-    
+
     // If there's an error, return mock data for development
     if (process.env.NODE_ENV === "development") {
       // Get origin and check if it's allowed
@@ -64,9 +62,9 @@ export async function GET(request: NextRequest) {
         "https://viral-tweet-generator.vercel.app",
         process.env.NEXT_PUBLIC_APP_URL,
       ].filter(Boolean);
-      
+
       const isAllowedOrigin = !origin || allowedOrigins.includes(origin);
-      
+
       const mockData = {
         status: "ok",
         articles: [
@@ -93,6 +91,7 @@ export async function GET(request: NextRequest) {
 
       // Set CORS headers for mock data
       const headers = new Headers();
+
       if (origin && isAllowedOrigin) {
         headers.set("Access-Control-Allow-Origin", origin);
       }
@@ -101,10 +100,10 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.json(mockData, { headers });
     }
-    
+
     return NextResponse.json(
       { error: "Failed to fetch news" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -117,15 +116,16 @@ export async function OPTIONS(request: NextRequest) {
     "https://viral-tweet-generator.vercel.app",
     process.env.NEXT_PUBLIC_APP_URL,
   ].filter(Boolean);
-  
+
   const isAllowedOrigin = !origin || allowedOrigins.includes(origin);
-  
+
   const headers = new Headers();
+
   if (origin && isAllowedOrigin) {
     headers.set("Access-Control-Allow-Origin", origin);
   }
   headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
   headers.set("Access-Control-Allow-Headers", "Content-Type");
-  
+
   return new NextResponse(null, { headers });
-} 
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+
 import { title, subtitle } from "@/components/primitives";
 import TweetGenerator from "@/components/tweet-generator/tweet-generator";
 import NewsSection from "@/components/tweet-generator/news-section";
@@ -21,7 +22,8 @@ export default function TweetGeneratorPage() {
           <span className={title()}>Generator</span>
         </h1>
         <div className={subtitle({ class: "mt-4" })}>
-          Create high-engagement tweets that blend curiosity, urgency, and debate for tech and AI audiences.
+          Create high-engagement tweets that blend curiosity, urgency, and
+          debate for tech and AI audiences.
         </div>
       </div>
 
@@ -35,4 +37,4 @@ export default function TweetGeneratorPage() {
       </div>
     </section>
   );
-} 
+}

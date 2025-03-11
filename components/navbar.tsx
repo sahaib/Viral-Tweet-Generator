@@ -7,21 +7,14 @@ import {
   NavbarItem,
   NavbarMenuItem,
 } from "@heroui/navbar";
-import { Button } from "@heroui/button";
 import { Kbd } from "@heroui/kbd";
 import { Link } from "@heroui/link";
 import { Input } from "@heroui/input";
-import { link as linkStyles } from "@heroui/theme";
 import NextLink from "next/link";
-import clsx from "clsx";
 
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
-import {
-  TwitterIcon,
-  GithubIcon,
-  SearchIcon,
-} from "@/components/icons";
+import { TwitterIcon, GithubIcon, SearchIcon } from "@/components/icons";
 import { TweetLogo } from "@/components/tweet-logo";
 import { KofiButton } from "@/components/kofi-button";
 import { KofiButtonSmall } from "@/components/kofi-button-small";
@@ -49,7 +42,7 @@ export const Navbar = () => {
   );
 
   return (
-    <HeroUINavbar maxWidth="xl" position="sticky" className="py-2">
+    <HeroUINavbar className="py-2" maxWidth="xl" position="sticky">
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">

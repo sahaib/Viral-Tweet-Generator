@@ -10,4 +10,4 @@ export default function TweetGeneratorLayout({
   children: React.ReactNode;
 }) {
   return <>{children}</>;
-} 
+}

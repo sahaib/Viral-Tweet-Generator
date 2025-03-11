@@ -4,8 +4,6 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { Switch } from "@heroui/switch";
-import { Snippet } from "@heroui/snippet";
-import { Code } from "@heroui/code";
 
 interface TweetGeneratorProps {
   externalTopic?: string;
@@ -29,6 +27,7 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic }) => {
   const handleGenerateTweet = async () => {
     if (!topic.trim()) {
       setError("Please enter a topic");
+
       return;
     }
 
@@ -52,6 +51,7 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic }) => {
       }
 
       const data = await response.json();
+
       setGeneratedTweet(data.tweet);
     } catch (err) {
       setError("Failed to generate tweet. Please try again.");
@@ -80,39 +80,35 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic }) => {
 
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
-          <label htmlFor="topic" className="text-sm font-medium">
+          <label className="text-sm font-medium" htmlFor="topic">
             Topic
           </label>
           <Input
+            className="w-full"
             id="topic"
             placeholder="e.g., AI coding assistants, Web3, Cloud computing"
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            variant="bordered"
             radius="sm"
-            className="w-full"
+            value={topic}
+            variant="bordered"
+            onChange={(e) => setTopic(e.target.value)}
           />
           {error && <p className="text-danger text-sm">{error}</p>}
         </div>
 
         <div className="flex items-center gap-2">
-          <Switch
-            isSelected={useGroq}
-            onValueChange={setUseGroq}
-            size="sm"
-          />
+          <Switch isSelected={useGroq} size="sm" onValueChange={setUseGroq} />
           <span className="text-sm">
             Use Groq (faster) - Fallback to OpenRouter if unavailable
           </span>
         </div>
 
         <Button
-          color="primary"
-          variant="shadow"
-          radius="sm"
-          onClick={handleGenerateTweet}
-          isLoading={isLoading}
           className="w-full"
+          color="primary"
+          isLoading={isLoading}
+          radius="sm"
+          variant="shadow"
+          onClick={handleGenerateTweet}
         >
           {isLoading ? "Generating..." : "Generate Tweet"}
         </Button>
@@ -123,9 +119,9 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic }) => {
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-semibold">Generated Tweet</h3>
             <Button
+              color={copySuccess ? "success" : "secondary"}
               size="sm"
               variant="flat"
-              color={copySuccess ? "success" : "secondary"}
               onClick={handleCopyTweet}
             >
               {copySuccess ? "Copied!" : "Copy"}
@@ -150,4 +146,4 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic }) => {
   );
 };
 
-export default TweetGenerator; 
+export default TweetGenerator;
