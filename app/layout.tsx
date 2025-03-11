@@ -46,6 +46,30 @@ export const metadata: Metadata = {
       },
     ],
   },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: process.env.NEXT_PUBLIC_APP_URL || "https://tweetsgen.sahaibsingh.com",
+    title: siteConfig.name,
+    description: siteConfig.description,
+    siteName: siteConfig.name,
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: siteConfig.name,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.name,
+    description: siteConfig.description,
+    images: ["/og-image.png"],
+    creator: "@sahaibsingh",
+  },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://tweetsgen.sahaibsingh.com"),
 };
 
 export const viewport: Viewport = {

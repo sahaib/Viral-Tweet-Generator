@@ -1,0 +1,49 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with gradient -->
+  <rect width="1200" height="630" fill="url(#paint0_linear)" />
+  
+  <!-- Purple accent shapes -->
+  <circle cx="1100" cy="100" r="200" fill="#8b5cf6" fill-opacity="0.1" />
+  <circle cx="100" cy="530" r="150" fill="#8b5cf6" fill-opacity="0.1" />
+  
+  <!-- Logo and title container -->
+  <g transform="translate(150, 180)">
+    <!-- Feather icon -->
+    <g transform="translate(0, 0) scale(3)">
+      <circle cx="24" cy="24" r="24" fill="#8b5cf6" />
+      <path d="M40.48 24.48a12 12 0 0 0-16.98-16.98L10 21V38h17z" fill="white" fill-opacity="0.9" stroke="white" stroke-width="0.5" />
+      <line x1="32" x2="4" y1="16" y2="44" stroke="white" stroke-width="1.5" />
+      <line x1="35" x2="18" y1="30" y2="30" stroke="white" stroke-width="1.5" />
+    </g>
+    
+    <!-- Title -->
+    <g transform="translate(170, 30)">
+      <text font-family="Arial, sans-serif" font-weight="bold" font-size="72" fill="#1f2937">
+        <tspan x="0" y="0">Viral</tspan>
+        <tspan x="180" y="0" fill="#8b5cf6">Tweet</tspan>
+        <tspan x="400" y="0">Generator</tspan>
+      </text>
+      
+      <!-- Subtitle -->
+      <text font-family="Arial, sans-serif" font-size="32" fill="#6b7280" x="0" y="60">
+        Create high-engagement tweets that blend curiosity,
+      </text>
+      <text font-family="Arial, sans-serif" font-size="32" fill="#6b7280" x="0" y="110">
+        urgency, and debate for tech and AI audiences.
+      </text>
+    </g>
+  </g>
+  
+  <!-- Powered by text -->
+  <text font-family="Arial, sans-serif" font-size="24" fill="#6b7280" x="150" y="550">
+    Powered by AI • Built with Next.js and HeroUI
+  </text>
+  
+  <!-- Gradient definition -->
+  <defs>
+    <linearGradient id="paint0_linear" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff" />
+      <stop offset="1" stop-color="#f3f4f6" />
+    </linearGradient>
+  </defs>
+</svg> 
