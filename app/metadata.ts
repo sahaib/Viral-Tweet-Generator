@@ -1,12 +1,11 @@
 import { Metadata } from "next";
-import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
   title: {
-    default: siteConfig.name,
+    default: "Viral Tweet Generator",
     template: `%s`,
   },
-  description: siteConfig.description,
+  description: "Generate viral tweets for tech and AI audiences.",
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.png",
@@ -42,23 +41,22 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://tweetsgen.sahaibsingh.com",
-    title: siteConfig.name,
-    description: siteConfig.description,
-    siteName: siteConfig.name,
+    title: "Viral Tweet Generator",
+    description: "Generate viral tweets for tech and AI audiences.",
+    siteName: "Viral Tweet Generator",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: siteConfig.name,
+        alt: "Viral Tweet Generator",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: siteConfig.name,
-    description: siteConfig.description,
+    title: "Viral Tweet Generator",
+    description: "Generate viral tweets for tech and AI audiences.",
     images: ["/og-image.png"],
     creator: "@sahaibsingh",
   },
