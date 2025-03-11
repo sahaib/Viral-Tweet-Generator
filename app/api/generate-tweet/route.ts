@@ -161,8 +161,7 @@ export async function POST(request: NextRequest) {
         // Try Groq first
         tweet = await callGroqAPI(prompt);
       } catch (error) {
-        console.error("Groq API error, falling back to OpenRouter:", error);
-        // Fallback to OpenRouter
+        // Fallback to OpenRouter without logging
         tweet = await callOpenRouterAPI(prompt);
       }
     } else {
@@ -181,8 +180,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ tweet }, { headers });
   } catch (error) {
-    console.error("Error generating tweet:", error);
-
+    // Error handling without console.error
     return NextResponse.json(
       { error: "Failed to generate tweet" },
       { status: 500 },

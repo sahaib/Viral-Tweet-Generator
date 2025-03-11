@@ -41,7 +41,6 @@ const NewsSection: React.FC<NewsSectionProps> = ({ onSelectTopic }) => {
       setNews(data.articles || []);
     } catch (err) {
       setError("Failed to load news. Please try again.");
-      console.error(err);
     } finally {
       setIsLoading(false);
     }

@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     // Return the articles
     return NextResponse.json(data, { headers });
   } catch (error) {
-    console.error("Error fetching news:", error);
+    // Error handling without console.error
 
     // If there's an error, return mock data for development
     if (process.env.NODE_ENV === "development") {

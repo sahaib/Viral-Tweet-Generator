@@ -55,7 +55,6 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic }) => {
       setGeneratedTweet(data.tweet);
     } catch (err) {
       setError("Failed to generate tweet. Please try again.");
-      console.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -138,8 +137,8 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic }) => {
       <div className="mt-4 text-sm text-default-400">
         <p>
           <strong>Pro Tip:</strong> For better results, be specific with your
-          topic and consider adding context like "for startups" or "for
-          developers".
+          topic and consider adding context like &quot;for startups&quot; or &quot;for
+          developers&quot;.
         </p>
       </div>
     </div>
