@@ -1,4 +1,4 @@
-import "@/styles/globals.css";
+import "../styles/globals.css";
 import { Viewport } from "next";
 import clsx from "clsx";
 import { Analytics } from "@vercel/analytics/react";
@@ -6,9 +6,9 @@ import { Analytics } from "@vercel/analytics/react";
 import { Providers } from "./providers";
 import { metadata } from "./metadata";
 
-import { siteConfig } from "@/config/site";
-import { fontSans } from "@/config/fonts";
-import { Navbar } from "@/components/navbar";
+import { siteConfig } from "../config/site";
+import { fontSans } from "../config/fonts";
+import { Navbar } from "../components/navbar";
 
 export { metadata };
 

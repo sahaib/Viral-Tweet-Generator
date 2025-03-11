@@ -1,8 +1,16 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
+  "buildCommand": "npm run prepare-deploy",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
+  "env": {
+    "NEXT_PUBLIC_APP_URL": "https://tweetsgen.sahaibsingh.com",
+    "NEXT_SKIP_LINT": "true",
+    "NEXT_SKIP_TYPE_CHECK": "true",
+    "SKIP_LINT": "true",
+    "NODE_ENV": "production"
+  },
+  "cleanUrls": true,
   "framework": "nextjs",
   "regions": ["iad1"],
   "headers": [
@@ -15,5 +23,6 @@
         { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version" }
       ]
     }
-  ]
+  ],
+  "outputDirectory": ".next"
 } 
