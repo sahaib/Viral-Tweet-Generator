@@ -19,75 +19,96 @@ interface SearchResponse {
   results: DDGSearchResult[];
 }
 
-export async function GET(request: NextRequest) {
+const ALLOWED_ORIGINS = [
+  "http://localhost:3000",
+  "https://tweetgen.sahaibsingh.com",
+  process.env.NEXT_PUBLIC_APP_URL,
+].filter(Boolean);
+
+// Add delay helper
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+export async function GET(request: Request) {
+  // Handle CORS
+  const origin = request.headers.get("origin") || "";
+  
+  if (!ALLOWED_ORIGINS.includes(origin)) {
+    return new NextResponse(null, {
+      status: 403,
+      statusText: "Forbidden",
+    });
+  }
+
+  if (request.method === "OPTIONS") {
+    return new NextResponse(null, {
+      headers: {
+        "Access-Control-Allow-Origin": origin,
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+      },
+    });
+  }
+
   try {
-    // Get origin and check if it's allowed
-    const origin = request.headers.get("origin");
-    const allowedOrigins = [
-      "http://localhost:3000",
-      "https://viral-tweet-generator.vercel.app",
-      "https://viral-tweet-generator-one.vercel.app",
-      "https://tweetsgen.sahaibsingh.com",
-      process.env.NEXT_PUBLIC_APP_URL,
-    ].filter(Boolean);
-
-    const isAllowedOrigin = !origin || allowedOrigins.includes(origin);
-
-    if (!isAllowedOrigin) {
-      return NextResponse.json({ error: "Not allowed" }, { status: 403 });
-    }
-
-    // Get search query from URL params
     const { searchParams } = new URL(request.url);
-    const query = searchParams.get("q") || "latest news";
-    
-    // Perform the search with a timeout
-    const searchPromise = search(query, {
-      safeSearch: SafeSearchType.MODERATE
+    const searchQuery = searchParams.get("q") || "";
+
+    // Add random delay between 1-3 seconds to avoid rate limiting
+    await delay(Math.random() * 2000 + 1000);
+
+    // Use a more conservative search approach
+    const searchPromise = search(searchQuery, {
+      safeSearch: SafeSearchType.MODERATE,
     });
-    
-    // Add timeout of 10 seconds
-    const timeoutPromise = new Promise<SearchResponse>((_, reject) => {
-      setTimeout(() => reject(new Error('Search timed out')), 10000);
+
+    // Add timeout to prevent hanging
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error("Search timed out")), 10000);
     });
-    
-    // Race between search and timeout
+
     const results = await Promise.race([searchPromise, timeoutPromise]);
 
-    // Transform results into our NewsItem format
-    const articles: NewsItem[] = results.results
-      .map((result: DDGSearchResult) => {
-        const domain = new URL(result.url).hostname.replace('www.', '');
-        return {
-          source: {
-            id: "ddg",
-            name: domain,
-          },
-          title: result.title,
-          url: result.url,
-          publishedAt: new Date().toISOString(),
-          author: "Via " + domain,
-          snippet: result.description,
-        };
-      })
-      .slice(0, 10); // Limit to 10 results
-
-    // Set CORS headers
-    const headers = new Headers();
-
-    if (origin && isAllowedOrigin) {
-      headers.set("Access-Control-Allow-Origin", origin);
+    if (!results || !Array.isArray(results)) {
+      throw new Error("Invalid search results");
     }
-    headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
-    headers.set("Access-Control-Allow-Headers", "Content-Type");
 
-    return NextResponse.json({ articles }, { headers });
+    const newsItems: NewsItem[] = results
+      .slice(0, 10)
+      .map(result => ({
+        source: {
+          id: "ddg",
+          name: new URL(result.url).hostname.replace('www.', ''),
+        },
+        title: result.title || "",
+        url: result.url || "",
+        publishedAt: new Date().toISOString(), // DuckDuckGo doesn't provide dates
+        author: "Via DuckDuckGo",
+        snippet: result.description,
+      }));
+
+    return new NextResponse(JSON.stringify({ items: newsItems }), {
+      headers: {
+        "Access-Control-Allow-Origin": origin,
+        "Content-Type": "application/json",
+      },
+    });
+
   } catch (error) {
-    console.error("Error fetching search results:", error);
-
-    return NextResponse.json(
-      { error: "Failed to fetch search results", details: error instanceof Error ? error.message : String(error) },
-      { status: 500 },
+    console.error("Search error:", error);
+    
+    // Return a more user-friendly error
+    return new NextResponse(
+      JSON.stringify({
+        error: "Unable to fetch search results at this time. Please try again later.",
+        details: error instanceof Error ? error.message : String(error),
+      }),
+      {
+        status: 500,
+        headers: {
+          "Access-Control-Allow-Origin": origin,
+          "Content-Type": "application/json",
+        },
+      }
     );
   }
 }
