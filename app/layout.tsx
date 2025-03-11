@@ -69,7 +69,11 @@ export const metadata: Metadata = {
     images: ["/og-image.png"],
     creator: "@sahaibsingh",
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://tweetsgen.sahaibsingh.com"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL 
+      ? process.env.NEXT_PUBLIC_APP_URL 
+      : "https://tweetsgen.sahaibsingh.com"
+  ),
 };
 
 export const viewport: Viewport = {
