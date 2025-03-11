@@ -130,37 +130,45 @@ function validateInput(topic: string) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Check if the request is from an allowed origin
-    const origin = request.headers.get("origin");
-    const allowedOrigins = [
-      "http://localhost:3000",
-      "https://viral-tweet-generator.vercel.app",
-      process.env.NEXT_PUBLIC_APP_URL,
-    ].filter(Boolean);
-
-    const isAllowedOrigin = !origin || allowedOrigins.includes(origin);
-
-    if (!isAllowedOrigin) {
-      return NextResponse.json({ error: "Not allowed" }, { status: 403 });
-    }
-
-    const { topic, useGroq } = await request.json();
+    // Get the request body
+    const { topic, useGroq = true } = await request.json();
 
     // Validate input
     const validation = validateInput(topic);
-
     if (!validation.valid) {
       return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
+    // Generate the prompt
     const prompt = generatePrompt(topic);
-    let tweet;
+
+    let tweet = "";
+
+    // Get origin and check if it's allowed
+    const origin = request.headers.get("origin");
+    const allowedOrigins = [
+      "http://localhost:3000",
+      "https://viral-tweet-generator.vercel.app",
+      "https://viral-tweet-generator-one.vercel.app",
+      "https://tweetsgen.sahaibsingh.com",
+      process.env.NEXT_PUBLIC_APP_URL,
+    ].filter(Boolean);
+
+    const isAllowedOrigin = !origin || allowedOrigins.includes(origin);
 
     if (useGroq) {
       try {
         // Try Groq first
         tweet = await callGroqAPI(prompt);
       } catch (error) {
+        // Log error details in production for debugging
+        if (process.env.NODE_ENV === "production") {
+          // Using Response object to log errors without console
+          return NextResponse.json(
+            { error: "Groq API error, falling back to OpenRouter", details: error instanceof Error ? error.message : String(error) },
+            { status: 500 }
+          );
+        }
         // Fallback to OpenRouter without logging
         tweet = await callOpenRouterAPI(prompt);
       }
@@ -180,10 +188,18 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ tweet }, { headers });
   } catch (error) {
-    // Error handling without console.error
+    // Error handling with more details in production
     return NextResponse.json(
-      { error: "Failed to generate tweet" },
-      { status: 500 },
+      { 
+        error: "Failed to generate tweet", 
+        details: error instanceof Error ? error.message : String(error),
+        env: {
+          hasGroqKey: !!process.env.GROQ_API_KEY,
+          hasOpenRouterKey: !!process.env.OPENROUTER_API_KEY,
+          appUrl: process.env.NEXT_PUBLIC_APP_URL || "not set"
+        }
+      },
+      { status: 500 }
     );
   }
 }
@@ -194,11 +210,14 @@ export async function OPTIONS(request: NextRequest) {
   const allowedOrigins = [
     "http://localhost:3000",
     "https://viral-tweet-generator.vercel.app",
+    "https://viral-tweet-generator-one.vercel.app",
+    "https://tweetsgen.sahaibsingh.com",
     process.env.NEXT_PUBLIC_APP_URL,
   ].filter(Boolean);
 
   const isAllowedOrigin = !origin || allowedOrigins.includes(origin);
 
+  // Set CORS headers
   const headers = new Headers();
 
   if (origin && isAllowedOrigin) {
@@ -207,5 +226,5 @@ export async function OPTIONS(request: NextRequest) {
   headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
   headers.set("Access-Control-Allow-Headers", "Content-Type");
 
-  return new NextResponse(null, { headers });
+  return new Response(null, { status: 204, headers });
 }

@@ -2,11 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
-    // Check if the request is from an allowed origin
+    // Get origin and check if it's allowed
     const origin = request.headers.get("origin");
     const allowedOrigins = [
       "http://localhost:3000",
       "https://viral-tweet-generator.vercel.app",
+      "https://viral-tweet-generator-one.vercel.app",
+      "https://tweetsgen.sahaibsingh.com",
       process.env.NEXT_PUBLIC_APP_URL,
     ].filter(Boolean);
 
@@ -60,6 +62,8 @@ export async function GET(request: NextRequest) {
       const allowedOrigins = [
         "http://localhost:3000",
         "https://viral-tweet-generator.vercel.app",
+        "https://viral-tweet-generator-one.vercel.app",
+        "https://tweetsgen.sahaibsingh.com",
         process.env.NEXT_PUBLIC_APP_URL,
       ].filter(Boolean);
 
@@ -114,11 +118,14 @@ export async function OPTIONS(request: NextRequest) {
   const allowedOrigins = [
     "http://localhost:3000",
     "https://viral-tweet-generator.vercel.app",
+    "https://viral-tweet-generator-one.vercel.app",
+    "https://tweetsgen.sahaibsingh.com",
     process.env.NEXT_PUBLIC_APP_URL,
   ].filter(Boolean);
 
   const isAllowedOrigin = !origin || allowedOrigins.includes(origin);
 
+  // Set CORS headers
   const headers = new Headers();
 
   if (origin && isAllowedOrigin) {
@@ -127,5 +134,5 @@ export async function OPTIONS(request: NextRequest) {
   headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
   headers.set("Access-Control-Allow-Headers", "Content-Type");
 
-  return new NextResponse(null, { headers });
+  return new Response(null, { status: 204, headers });
 }

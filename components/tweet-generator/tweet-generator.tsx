@@ -27,15 +27,18 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic }) => {
   const handleGenerateTweet = async () => {
     if (!topic.trim()) {
       setError("Please enter a topic");
-
       return;
     }
 
     setIsLoading(true);
     setError(null);
+    setGeneratedTweet("");
 
     try {
-      const response = await fetch("/api/generate-tweet", {
+      // Show the API URL being called for debugging
+      const apiUrl = "/api/generate-tweet";
+      
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -46,15 +49,31 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic }) => {
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to generate tweet");
+        // Handle server error with details if available
+        const errorMessage = data.details 
+          ? `Error: ${data.error}. Details: ${data.details}`
+          : data.error || "Failed to generate tweet";
+        
+        // If we have environment info, include it in the error
+        if (data.env) {
+          const envInfo = `API Keys: ${data.env.hasGroqKey ? '✓' : '✗'} Groq, ${data.env.hasOpenRouterKey ? '✓' : '✗'} OpenRouter. App URL: ${data.env.appUrl}`;
+          throw new Error(`${errorMessage}. ${envInfo}`);
+        }
+        
+        throw new Error(errorMessage);
       }
 
-      const data = await response.json();
+      if (!data.tweet) {
+        throw new Error("No tweet was generated. Please try again.");
+      }
 
       setGeneratedTweet(data.tweet);
     } catch (err) {
-      setError("Failed to generate tweet. Please try again.");
+      const errorMessage = err instanceof Error ? err.message : "Failed to generate tweet. Please try again.";
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
