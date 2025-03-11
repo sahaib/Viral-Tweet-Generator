@@ -38,7 +38,7 @@ function corsHeaders(origin: string): Record<string, string> {
   // In development, allow any origin
   if (process.env.NODE_ENV === 'development') {
     return {
-      "Access-Control-Allow-Origin": origin || "*",
+      "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
     };
@@ -50,10 +50,11 @@ function corsHeaders(origin: string): Record<string, string> {
       "Access-Control-Allow-Origin": origin,
       "Access-Control-Allow-Methods": "GET, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Allow-Credentials": "true",
     };
   }
 
-  // Return empty headers if origin not allowed
+  // Return restrictive headers if origin not allowed
   return {
     "Access-Control-Allow-Origin": "null",
     "Access-Control-Allow-Methods": "GET, OPTIONS",

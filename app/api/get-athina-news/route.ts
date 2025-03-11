@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
       "http://localhost:3000",
       "https://viral-tweet-generator.vercel.app",
       "https://viral-tweet-generator-one.vercel.app",
+      "https://tweetgen.sahaibsingh.com",
       "https://tweetsgen.sahaibsingh.com",
       process.env.NEXT_PUBLIC_APP_URL,
     ].filter(Boolean);
@@ -176,6 +177,11 @@ export async function GET(request: NextRequest) {
 
     if (origin && isAllowedOrigin) {
       headers.set("Access-Control-Allow-Origin", origin);
+      headers.set("Access-Control-Allow-Credentials", "true");
+    } else if (process.env.NODE_ENV === 'development') {
+      headers.set("Access-Control-Allow-Origin", "*");
+    } else {
+      headers.set("Access-Control-Allow-Origin", "null");
     }
     headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
     headers.set("Access-Control-Allow-Headers", "Content-Type");
@@ -229,6 +235,7 @@ export async function OPTIONS(request: NextRequest) {
     "http://localhost:3000",
     "https://viral-tweet-generator.vercel.app",
     "https://viral-tweet-generator-one.vercel.app",
+    "https://tweetgen.sahaibsingh.com",
     "https://tweetsgen.sahaibsingh.com",
     process.env.NEXT_PUBLIC_APP_URL,
   ].filter(Boolean);

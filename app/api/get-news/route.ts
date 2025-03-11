@@ -46,6 +46,11 @@ export async function GET(request: NextRequest) {
 
     if (origin && isAllowedOrigin) {
       headers.set("Access-Control-Allow-Origin", origin);
+      headers.set("Access-Control-Allow-Credentials", "true");
+    } else if (process.env.NODE_ENV === 'development') {
+      headers.set("Access-Control-Allow-Origin", "*");
+    } else {
+      headers.set("Access-Control-Allow-Origin", "null");
     }
     headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
     headers.set("Access-Control-Allow-Headers", "Content-Type");
