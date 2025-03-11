@@ -11,6 +11,7 @@ interface NewsItem {
   publishedAt: string;
   author: string;
   snippet: string;
+  fullContent: string;
 }
 
 // Define allowed origins
@@ -119,6 +120,9 @@ export async function GET(request: Request) {
         // Extract domain name for the source
         const domain = item.link ? new URL(item.link).hostname.replace('www.', '') : 'news source';
         
+        // Combine title and snippet for full content
+        const fullContent = `${item.title || ""}\n\n${item.snippet || ""}`;
+        
         return {
           source: {
             id: "ddg",
@@ -128,7 +132,8 @@ export async function GET(request: Request) {
           url: item.link || "",
           publishedAt: new Date().toISOString(),
           author: domain,
-          snippet: item.snippet || item.title || ""
+          snippet: item.snippet || item.title || "",
+          fullContent: fullContent.trim() // Add full content field
         };
       });
 

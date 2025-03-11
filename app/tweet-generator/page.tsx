@@ -8,9 +8,14 @@ import NewsSection from "@/components/tweet-generator/news-section";
 
 export default function TweetGeneratorPage() {
   const [selectedTopic, setSelectedTopic] = useState<string>("");
+  const [selectedContent, setSelectedContent] = useState<string>("");
+  const [key, setKey] = useState(0);
 
-  const handleSelectTopic = (topic: string) => {
+  const handleSelectTopic = (topic: string, fullContent?: string) => {
+    console.log('Page received topic:', { topic, fullContent });
     setSelectedTopic(topic);
+    setSelectedContent(fullContent || "");
+    setKey(prev => prev + 1);
   };
 
   return (
@@ -29,7 +34,11 @@ export default function TweetGeneratorPage() {
 
       <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
         <div className="lg:col-span-2 order-2 lg:order-1">
-          <TweetGenerator externalTopic={selectedTopic} />
+          <TweetGenerator 
+            key={key}
+            externalTopic={selectedTopic} 
+            externalContent={selectedContent}
+          />
         </div>
         <div className="lg:col-span-1 order-1 lg:order-2">
           <NewsSection onSelectTopic={handleSelectTopic} />

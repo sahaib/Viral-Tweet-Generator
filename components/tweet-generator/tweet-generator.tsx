@@ -8,28 +8,55 @@ import { track } from "@vercel/analytics";
 
 interface TweetGeneratorProps {
   externalTopic?: string;
+  externalContent?: string;
 }
 
-const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic }) => {
+const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic, externalContent }) => {
   const [topic, setTopic] = useState<string>("");
+  const [fullContent, setFullContent] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [generatedTweet, setGeneratedTweet] = useState<string>("");
   const [useGroq, setUseGroq] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [copySuccess, setCopySuccess] = useState<boolean>(false);
 
-  // Effect to update the topic when externalTopic changes
+  // Effect to update the topic and content when external values change
   useEffect(() => {
+    console.log('External values changed:', { externalTopic, externalContent });
+    
+    // Update topic immediately if provided
     if (externalTopic) {
+      console.log('Setting topic to:', externalTopic);
       setTopic(externalTopic);
       // Track when a topic is selected from news
       track("topic_selected_from_news", {
-        topic: externalTopic
+        topic: externalTopic,
+        hasContent: !!externalContent
       });
     }
-  }, [externalTopic]);
+
+    // Update content immediately if provided
+    if (externalContent) {
+      console.log('Setting content to:', externalContent);
+      setFullContent(externalContent);
+    }
+
+    // Clear error if any
+    setError(null);
+  }, [externalTopic, externalContent]);
+
+  // Reset states when component unmounts
+  useEffect(() => {
+    return () => {
+      setTopic("");
+      setFullContent("");
+      setGeneratedTweet("");
+      setError(null);
+    };
+  }, []);
 
   const handleGenerateTweet = async () => {
+    console.log('Generating tweet with:', { topic, fullContent });
     if (!topic.trim()) {
       setError("Please enter a topic");
       return;
@@ -43,7 +70,8 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic }) => {
       // Track tweet generation attempt
       track("tweet_generation_started", {
         topic: topic,
-        useGroq: useGroq
+        useGroq: useGroq,
+        hasContent: !!fullContent
       });
 
       const apiUrl = "/api/generate-tweet";
@@ -55,11 +83,14 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic }) => {
         },
         body: JSON.stringify({
           topic,
+          fullContent: fullContent || undefined,
           useGroq,
         }),
       });
 
+      console.log('API response:', response.status);
       const data = await response.json();
+      console.log('API data:', data);
 
       if (!response.ok) {
         // Track generation error

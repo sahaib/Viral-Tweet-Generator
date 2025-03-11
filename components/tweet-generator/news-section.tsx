@@ -15,10 +15,12 @@ interface NewsItem {
   };
   publishedAt: string;
   author?: string;
+  fullContent?: string;
+  snippet?: string;
 }
 
 interface NewsSectionProps {
-  onSelectTopic: (topic: string) => void;
+  onSelectTopic: (topic: string, fullContent?: string) => void;
 }
 
 const NewsSection: React.FC<NewsSectionProps> = ({ onSelectTopic }) => {
@@ -114,20 +116,28 @@ const NewsSection: React.FC<NewsSectionProps> = ({ onSelectTopic }) => {
     });
   };
 
-  const handleUseTopic = (title: string, index: number) => {
-    onSelectTopic(title);
-    setSelectedItemIndex(index);
+  const handleUseTopic = (item: NewsItem, index: number) => {
+    // Use fullContent if available, otherwise combine title and snippet
+    const content = item.fullContent || `${item.title}\n\n${item.snippet || ''}`;
+    console.log('News item selected:', { item, content });
+    
+    // Ensure we're passing non-empty values
+    if (item.title.trim()) {
+      onSelectTopic(item.title.trim(), content.trim());
+      setSelectedItemIndex(index);
 
-    // Track when a news item is selected
-    track("news_item_selected", {
-      title: title,
-      source: selectedTab
-    });
+      // Track when a news item is selected
+      track("news_item_selected", {
+        title: item.title,
+        source: selectedTab,
+        hasFullContent: !!item.fullContent
+      });
 
-    // Reset the selected item after a delay
-    setTimeout(() => {
-      setSelectedItemIndex(null);
-    }, 2000);
+      // Reset the selected item after a delay
+      setTimeout(() => {
+        setSelectedItemIndex(null);
+      }, 2000);
+    }
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -210,7 +220,7 @@ const NewsSection: React.FC<NewsSectionProps> = ({ onSelectTopic }) => {
                 color={selectedItemIndex === index ? "success" : "secondary"}
                 size="sm"
                 variant="light"
-                onClick={() => handleUseTopic(item.title, index)}
+                onClick={() => handleUseTopic(item, index)}
               >
                 {selectedItemIndex === index ? "Used" : "Use"}
               </Button>

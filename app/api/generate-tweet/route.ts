@@ -1,35 +1,82 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // Define the prompt template for tweet generation
-const generatePrompt = (topic: string) => {
+const generatePrompt = (topic: string, fullContent?: string) => {
   // Truncate topic if it's too long while preserving meaning
   const truncatedTopic = topic.length > 200 ? topic.slice(0, 197) + "..." : topic;
 
+  const contextSection = fullContent 
+    ? `Context:
+Topic to create a tweet about: "${truncatedTopic}"
+Full content to reference:
+${fullContent}`
+    : `Context:
+Topic to create a tweet about: "${truncatedTopic}"`;
+
   return `
-Role: You're a social media expert who creates viral, engaging tweets that resonate with diverse audiences. Create tweets that are informative, engaging, and shareable.
+Role: You are an elite social media strategist who specializes in creating viral tweets that consistently get high engagement. Your tweets are known for their perfect blend of curiosity, value, and emotional resonance.
 
-Context:
-- Audience: General public with varying interests and backgrounds
-- Focus: Creating engaging, shareable content that provides value
-- Tone: Conversational, engaging, and authentic
+${contextSection}
 
-Key Elements to Include:
-- Hook: Start with an attention-grabbing statement or question
-- Value: Provide interesting information, insight, or perspective
-- Engagement Trigger: Include elements that encourage likes, retweets, or replies
-- Authenticity: Keep the tone genuine and relatable
-- Timing: Make it feel current and relevant
+IMPORTANT: Each tweet must use a DIFFERENT opening pattern. Never default to the same starter. Vary your approach for each tweet.
 
-Guidelines:
-- Use clear, accessible language
-- Include specific details or numbers when relevant
-- Create curiosity or spark discussion
-- Add personality while maintaining credibility
-- Structure: Hook → Value → Call-to-Action/Discussion Point
+Key Tweet Elements to Master:
+1. Dynamic Opening Patterns (choose one, never repeat):
+   - Direct Value: "The best way to..."
+   - Insight Hook: "What most people get wrong about..."
+   - Expert Perspective: "Top performers always..."
+   - Future Vision: "The future of..."
+   - Contrarian View: "Everyone says X, but..."
+   - Discovery: "Just found out why..."
+   - Question Hook: "Ever wondered why..."
+   - Challenge: "Stop doing X if you..."
+   - Framework: "The key principles of..."
+   - Reality Check: "Here's the truth about..."
 
-Topic: ${truncatedTopic}
+2. Value Delivery:
+   - Share meaningful insights and observations
+   - Offer unique perspectives or contrarian views
+   - Break down complex topics into simple insights
+   - Reveal insider knowledge or expert tips
+   - Challenge common misconceptions
 
-Generate a single engaging tweet (max 280 characters) about this topic using the above framework. Focus on making it shareable and discussion-worthy. Do not include any explanations, just output the tweet text.
+3. Engagement Triggers:
+   - Ask thought-provoking questions
+   - Use "You" to make it personal
+   - Share relatable experiences
+   - Create "aha moments"
+   - Encourage saves and shares
+
+4. Viral Elements (include at least one):
+   - Counterintuitive insights
+   - "I wish I knew this sooner" moments
+   - Actionable takeaways
+   - Unexpected revelations
+   - Industry secrets or behind-the-scenes info
+
+Style Guide:
+- Write in a conversational, yet authoritative tone
+- Use short, punchy sentences
+- Focus on qualitative insights rather than unverified statistics
+- Create a sense of immediacy
+- End with a powerful insight or call-to-action
+- Avoid hashtags unless absolutely necessary
+- Keep under 280 characters
+- Use emojis sparingly and strategically
+- NEVER use made-up statistics or specific numbers without verification
+- NEVER default to repetitive openers
+
+Example Tweet Structures (for inspiration only, create unique variations):
+1. "The hidden truth about [topic] that experts don't talk about:"
+2. "Want better results with [topic]? Start with this unconventional approach:"
+3. "The real reason most people struggle with [topic]:"
+4. "Everyone gets this wrong about [topic]. Here's why:"
+5. "The one thing that changed everything I knew about [topic]:"
+6. "Stop wasting time on [topic] until you understand this:"
+
+Generate a single tweet that would make people stop scrolling, engage with the content, and feel compelled to share it with others. Focus on providing genuine value while maintaining high virality potential.
+
+Output the tweet text only, no explanations or additional context.
 `;
 };
 
@@ -143,7 +190,7 @@ function validateInput(topic: string) {
 export async function POST(request: NextRequest) {
   try {
     // Get the request body
-    const { topic, useGroq = true } = await request.json();
+    const { topic, fullContent, useGroq = true } = await request.json();
 
     // Validate input
     const validation = validateInput(topic);
@@ -152,7 +199,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate the prompt
-    const prompt = generatePrompt(topic);
+    const prompt = generatePrompt(topic, fullContent);
 
     let tweet = "";
 
