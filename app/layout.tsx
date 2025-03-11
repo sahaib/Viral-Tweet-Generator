@@ -69,12 +69,15 @@ export const metadata: Metadata = {
     images: ["/og-image.png"],
     creator: "@sahaibsingh",
   },
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL 
-      ? process.env.NEXT_PUBLIC_APP_URL 
-      : "https://tweetsgen.sahaibsingh.com"
-  ),
 };
+
+// Define the base URL for metadata
+const baseUrl = "https://tweetsgen.sahaibsingh.com";
+
+// Add metadataBase if we're in a production environment
+if (process.env.NODE_ENV === "production") {
+  metadata.metadataBase = new URL(baseUrl);
+}
 
 export const viewport: Viewport = {
   themeColor: [
