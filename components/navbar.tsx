@@ -1,5 +1,5 @@
 import {
-  Navbar as HeroUINavbar,
+  Navbar as NextUINavbar,
   NavbarContent,
   NavbarMenu,
   NavbarMenuToggle,
@@ -12,12 +12,12 @@ import { Link } from "@heroui/link";
 import { Input } from "@heroui/input";
 import NextLink from "next/link";
 
-import { siteConfig } from "@/config/site";
-import { ThemeSwitch } from "@/components/theme-switch";
-import { TwitterIcon, GithubIcon, SearchIcon } from "@/components/icons";
-import { TweetLogo } from "@/components/tweet-logo";
-import { KofiButton } from "@/components/kofi-button";
-import { KofiButtonSmall } from "@/components/kofi-button-small";
+import { siteConfig } from "../config/site";
+import { ThemeSwitch } from "./theme-switch";
+import { TwitterIcon, GithubIcon, SearchIcon } from "./icons";
+import { TweetLogo } from "./tweet-logo";
+import { KofiButton } from "./kofi-button";
+import { KofiButtonSmall } from "./kofi-button-small";
 
 export const Navbar = () => {
   const searchInput = (
@@ -42,7 +42,7 @@ export const Navbar = () => {
   );
 
   return (
-    <HeroUINavbar className="py-2" maxWidth="xl" position="sticky">
+    <NextUINavbar className="py-2" maxWidth="xl" position="sticky">
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
@@ -92,6 +92,6 @@ export const Navbar = () => {
           </NavbarMenuItem>
         </div>
       </NavbarMenu>
-    </HeroUINavbar>
+    </NextUINavbar>
   );
 };
