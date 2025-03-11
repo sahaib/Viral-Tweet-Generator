@@ -2,23 +2,34 @@ import { NextRequest, NextResponse } from "next/server";
 
 // Define the prompt template for tweet generation
 const generatePrompt = (topic: string) => {
+  // Truncate topic if it's too long while preserving meaning
+  const truncatedTopic = topic.length > 200 ? topic.slice(0, 197) + "..." : topic;
+
   return `
-Role: You're a viral content strategist for tech and AI. Create high-engagement tweets that blend curiosity, urgency, and debate.
+Role: You're a social media expert who creates viral, engaging tweets that resonate with diverse audiences. Create tweets that are informative, engaging, and shareable.
 
 Context:
-- Audience: Tech founders, developers, AI enthusiasts.
-- Trends: Focus on cutting-edge tools, ethical debates, or disruptive predictions.
-- Tone: Bold, conversational, slightly provocative. Use humor, analogies, and cliffhangers.
+- Audience: General public with varying interests and backgrounds
+- Focus: Creating engaging, shareable content that provides value
+- Tone: Conversational, engaging, and authentic
 
 Key Elements to Include:
-- Hook: Start with a shocking stat, analogy, or question.
-- Bold Angle: Add a contrarian take, prediction, or comparison.
-- Engagement Trigger: End with a debate question, poll, or FOMO tease.
-- Viral Structure: Short lines, emoji breaks (🚀/🤯/💡), italics for emphasis.
+- Hook: Start with an attention-grabbing statement or question
+- Value: Provide interesting information, insight, or perspective
+- Engagement Trigger: Include elements that encourage likes, retweets, or replies
+- Authenticity: Keep the tone genuine and relatable
+- Timing: Make it feel current and relevant
 
-Topic: ${topic}
+Guidelines:
+- Use clear, accessible language
+- Include specific details or numbers when relevant
+- Create curiosity or spark discussion
+- Add personality while maintaining credibility
+- Structure: Hook → Value → Call-to-Action/Discussion Point
 
-Generate a single viral tweet (max 280 characters) about this topic using the above framework. Prioritize shareable, debate-driven language. Do not include any explanations, just output the tweet text.
+Topic: ${truncatedTopic}
+
+Generate a single engaging tweet (max 280 characters) about this topic using the above framework. Focus on making it shareable and discussion-worthy. Do not include any explanations, just output the tweet text.
 `;
 };
 
@@ -112,9 +123,10 @@ function validateInput(topic: string) {
     return { valid: false, error: "Topic is required" };
   }
 
-  if (topic.length > 200) {
-    return { valid: false, error: "Topic is too long (max 200 characters)" };
-  }
+  // Remove validation for topic length since we'll truncate it if needed
+  // if (topic.length > 200) {
+  //   return { valid: false, error: "Topic is too long (max 200 characters)" };
+  // }
 
   // Check for potentially harmful content
   const bannedTerms = ["harmful", "illegal", "offensive", "hate speech"];

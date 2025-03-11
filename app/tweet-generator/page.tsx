@@ -22,8 +22,8 @@ export default function TweetGeneratorPage() {
           <span className={title()}>Generator</span>
         </h1>
         <div className={subtitle({ class: "mt-4" })}>
-          Create high-engagement tweets that blend curiosity, urgency, and
-          debate for tech and AI audiences.
+          Create high-engagement tweets that blend curiosity, authenticity, and
+          value for any topic or audience.
         </div>
       </div>
 

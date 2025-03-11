@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { Switch } from "@heroui/switch";
+import { track } from "@vercel/analytics";
 
 interface TweetGeneratorProps {
   externalTopic?: string;
@@ -21,6 +22,10 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic }) => {
   useEffect(() => {
     if (externalTopic) {
       setTopic(externalTopic);
+      // Track when a topic is selected from news
+      track("topic_selected_from_news", {
+        topic: externalTopic
+      });
     }
   }, [externalTopic]);
 
@@ -35,7 +40,12 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic }) => {
     setGeneratedTweet("");
 
     try {
-      // Show the API URL being called for debugging
+      // Track tweet generation attempt
+      track("tweet_generation_started", {
+        topic: topic,
+        useGroq: useGroq
+      });
+
       const apiUrl = "/api/generate-tweet";
       
       const response = await fetch(apiUrl, {
@@ -52,12 +62,17 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        // Handle server error with details if available
+        // Track generation error
+        track("tweet_generation_error", {
+          topic: topic,
+          error: data.error,
+          details: data.details
+        });
+
         const errorMessage = data.details 
           ? `Error: ${data.error}. Details: ${data.details}`
           : data.error || "Failed to generate tweet";
         
-        // If we have environment info, include it in the error
         if (data.env) {
           const envInfo = `API Keys: ${data.env.hasGroqKey ? '✓' : '✗'} Groq, ${data.env.hasOpenRouterKey ? '✓' : '✗'} OpenRouter. App URL: ${data.env.appUrl}`;
           throw new Error(`${errorMessage}. ${envInfo}`);
@@ -71,6 +86,14 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic }) => {
       }
 
       setGeneratedTweet(data.tweet);
+
+      // Track successful generation
+      track("tweet_generation_success", {
+        topic: topic,
+        useGroq: useGroq,
+        tweetLength: data.tweet.length
+      });
+
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to generate tweet. Please try again.";
       setError(errorMessage);
@@ -83,6 +106,13 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic }) => {
     if (generatedTweet) {
       navigator.clipboard.writeText(generatedTweet);
       setCopySuccess(true);
+      
+      // Track tweet copy
+      track("tweet_copied", {
+        topic: topic,
+        tweetLength: generatedTweet.length
+      });
+
       setTimeout(() => setCopySuccess(false), 2000);
     }
   };
@@ -92,7 +122,7 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic }) => {
       <div className="flex flex-col gap-2">
         <h2 className="text-xl font-bold">Generate Viral Tweet</h2>
         <p className="text-default-500">
-          Enter a topic to generate a viral tweet for tech and AI audiences
+          Enter any topic to generate an engaging, shareable tweet
         </p>
       </div>
 
@@ -104,7 +134,7 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic }) => {
           <Input
             className="w-full"
             id="topic"
-            placeholder="e.g., AI coding assistants, Web3, Cloud computing"
+            placeholder="e.g., Travel tips, Food trends, Sports news, Business insights"
             radius="sm"
             value={topic}
             variant="bordered"
@@ -156,8 +186,10 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic }) => {
       <div className="mt-4 text-sm text-default-400">
         <p>
           <strong>Pro Tip:</strong> For better results, be specific with your
-          topic and consider adding context like &quot;for startups&quot; or &quot;for
-          developers&quot;.
+          topic and add context like &quot;for beginners&quot; or &quot;latest trends&quot;.
+        </p>
+        <p className="mt-2 text-warning-500">
+          <strong>Disclaimer:</strong> This is a tweet generation tool only. Always fact-check information and verify sources before sharing. Responsible content sharing is essential for maintaining credibility and preventing misinformation.
         </p>
       </div>
     </div>
