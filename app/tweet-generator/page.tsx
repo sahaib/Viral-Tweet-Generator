@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 
-import { title, subtitle } from "@/components/primitives";
+import { title, subtitle } from "../../components/primitives";
 import TweetGenerator from "@/components/tweet-generator/tweet-generator";
 import NewsSection from "@/components/tweet-generator/news-section";
 
