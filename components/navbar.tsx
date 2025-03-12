@@ -1,16 +1,21 @@
+"use client";
+
+import React from "react";
+import { usePathname } from "next/navigation";
 import {
   Navbar as NextUINavbar,
-  NavbarContent,
-  NavbarMenu,
-  NavbarMenuToggle,
-  NavbarBrand,
-  NavbarItem,
-  NavbarMenuItem,
+  NavbarBrand as NextUINavbarBrand,
+  NavbarContent as NextUINavbarContent,
+  NavbarItem as NextUINavbarItem,
+  NavbarMenu as NextUINavbarMenu,
+  NavbarMenuItem as NextUINavbarMenuItem,
+  NavbarMenuToggle as NextUINavbarMenuToggle,
 } from "@heroui/navbar";
 import { Kbd } from "@heroui/kbd";
 import { Link } from "@heroui/link";
 import { Input } from "@heroui/input";
 import NextLink from "next/link";
+import { motion } from "framer-motion";
 
 import { siteConfig } from "../config/site";
 import { ThemeSwitch } from "./theme-switch";
@@ -19,7 +24,21 @@ import { TweetLogo } from "./tweet-logo";
 import { KofiButton } from "./kofi-button";
 import { KofiButtonSmall } from "./kofi-button-small";
 
+const navItems = [
+  {
+    label: "Tech Tweets",
+    href: "/tweet-generator",
+  },
+  {
+    label: "Casual Tweets",
+    href: "/casual-tweets",
+  },
+];
+
 export const Navbar = () => {
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const pathname = usePathname();
+
   const searchInput = (
     <Input
       aria-label="Search"
@@ -42,56 +61,95 @@ export const Navbar = () => {
   );
 
   return (
-    <NextUINavbar className="py-2" maxWidth="xl" position="sticky">
-      <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
-        <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink className="flex justify-start items-center gap-1" href="/">
+    <NextUINavbar
+      maxWidth="xl"
+      position="sticky"
+      className="bg-background/70 backdrop-blur-md"
+      isMenuOpen={isMenuOpen}
+      onMenuOpenChange={setIsMenuOpen}
+    >
+      <NextUINavbarContent>
+        <NextUINavbarMenuToggle
+          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          className="sm:hidden"
+        />
+        <NextUINavbarBrand className="gap-3">
+          <Link href="/" className="flex items-center gap-2">
             <TweetLogo />
-            <span className="font-bold text-inherit">Viral Tweets</span>
-          </NextLink>
-        </NavbarBrand>
-      </NavbarContent>
+            <p className="font-bold text-inherit">Tweet Generator</p>
+          </Link>
+        </NextUINavbarBrand>
+      </NextUINavbarContent>
 
-      <NavbarContent
-        className="hidden sm:flex basis-1/5 sm:basis-full"
-        justify="end"
-      >
-        <NavbarItem className="hidden sm:flex gap-2">
-          <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
-            <TwitterIcon className="text-default-500" />
+      <NextUINavbarContent className="hidden sm:flex gap-4" justify="center">
+        {navItems.map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <NextUINavbarItem key={item.href}>
+              <Link
+                className={`relative px-4 py-2 rounded-full transition-all duration-200 ${
+                  isActive
+                    ? "text-primary bg-primary/10 font-medium shadow-sm"
+                    : "text-default-600 hover:text-primary hover:bg-primary/5"
+                }`}
+                href={item.href}
+              >
+                {item.label}
+              </Link>
+            </NextUINavbarItem>
+          );
+        })}
+      </NextUINavbarContent>
+
+      <NextUINavbarContent justify="end">
+        <NextUINavbarItem className="hidden sm:flex">
+          <Link
+            isExternal
+            href={siteConfig.links.github}
+            className="text-default-600 hover:text-primary transition-colors"
+          >
+            <GithubIcon className="text-default-600" />
           </Link>
-          <Link isExternal aria-label="Github" href={siteConfig.links.github}>
-            <GithubIcon className="text-default-500" />
-          </Link>
+        </NextUINavbarItem>
+        <NextUINavbarItem className="hidden sm:flex">
           <ThemeSwitch />
-        </NavbarItem>
-        <NavbarItem className="hidden md:flex">
+        </NextUINavbarItem>
+        <NextUINavbarItem className="hidden sm:flex">
           <KofiButton username="sahaib" />
-        </NavbarItem>
-      </NavbarContent>
+        </NextUINavbarItem>
+      </NextUINavbarContent>
 
-      <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
-        <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
-          <TwitterIcon className="text-default-500" />
-        </Link>
-        <Link isExternal aria-label="Github" href={siteConfig.links.github}>
-          <GithubIcon className="text-default-500" />
-        </Link>
-        <KofiButtonSmall username="sahaib" />
-        <ThemeSwitch />
-        <NavbarMenuToggle />
-      </NavbarContent>
-
-      <NavbarMenu>
-        {searchInput}
-        <div className="mx-4 mt-2 flex flex-col gap-2">
-          <NavbarMenuItem>
-            <div className="mt-2">
-              <KofiButton username="sahaib" />
-            </div>
-          </NavbarMenuItem>
-        </div>
-      </NavbarMenu>
+      <NextUINavbarMenu>
+        {navItems.map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <NextUINavbarMenuItem key={item.href}>
+              <Link
+                className={`w-full text-lg py-2 ${
+                  isActive
+                    ? "text-primary font-medium"
+                    : "text-default-600 hover:text-primary"
+                }`}
+                href={item.href}
+              >
+                {item.label}
+              </Link>
+            </NextUINavbarMenuItem>
+          );
+        })}
+        <NextUINavbarMenuItem>
+          <Link
+            isExternal
+            href={siteConfig.links.github}
+            className="text-default-600 hover:text-primary w-full text-lg py-2"
+          >
+            GitHub
+          </Link>
+        </NextUINavbarMenuItem>
+        <NextUINavbarMenuItem className="mt-3">
+          <KofiButtonSmall username="sahaib" />
+        </NextUINavbarMenuItem>
+      </NextUINavbarMenu>
     </NextUINavbar>
   );
 };
