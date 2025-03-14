@@ -81,12 +81,18 @@ const NewsSection: React.FC<NewsSectionProps> = ({ onSelectTopic }) => {
     }
   };
 
-  const fetchDdgNews = async (query?: string) => {
+  const fetchDdgNews = async (query: string) => {
     setIsDdgLoading(true);
     setDdgError(null);
 
     try {
-      const response = await fetch(`/api/get-ddg-news${query ? `?q=${encodeURIComponent(query)}` : ''}`);
+      const response = await fetch("/api/search", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ searchTerm: query }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to fetch search results");
@@ -104,7 +110,7 @@ const NewsSection: React.FC<NewsSectionProps> = ({ onSelectTopic }) => {
   useEffect(() => {
     fetchNews();
     fetchAthinaNews();
-    fetchDdgNews();
+    fetchDdgNews(searchQuery);
   }, []);
 
   const formatDate = (dateString: string) => {
@@ -283,19 +289,19 @@ const NewsSection: React.FC<NewsSectionProps> = ({ onSelectTopic }) => {
         </Tab>
         <Tab key="athina" title="Athina AI Hub">
           <p className="text-default-500 text-sm mb-4 text-justify">
-            Content sourced from Athina AI Hub (hub.athina.ai). All articles and content belong to their respective authors and Athina AI. We do not own or claim any rights to this content.
+            Content sourced from Athina AI Hub (hub.athina.ai). All articles and content belong to their respective authors and Athina AI.
           </p>
           {renderNewsItems(athinaNews, isAthinaLoading, athinaError)}
         </Tab>
-        <Tab key="search" title="Search News">
+        <Tab key="search" title="AI Search">
           <div className="flex flex-col gap-4">
             <p className="text-default-500 text-sm">
-              Search for specific topics across trusted tech news sources
+              Search across the web using AI-powered search for more relevant results
             </p>
             <form onSubmit={handleSearch} className="flex gap-2">
               <Input
                 className="flex-grow"
-                placeholder="Search tech news..."
+                placeholder="Search any topic..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
