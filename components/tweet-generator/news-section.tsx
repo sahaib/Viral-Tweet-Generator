@@ -17,6 +17,7 @@ interface NewsItem {
   author?: string;
   fullContent?: string;
   snippet?: string;
+  fullContext?: string;
 }
 
 interface NewsSectionProps {
@@ -123,13 +124,14 @@ const NewsSection: React.FC<NewsSectionProps> = ({ onSelectTopic }) => {
   };
 
   const handleUseTopic = (item: NewsItem, index: number) => {
-    // Use fullContent if available, otherwise combine title and snippet
-    const content = item.fullContent || `${item.title}\n\n${item.snippet || ''}`;
+    // Use fullContent directly, no need for fallbacks since we're consistent now
+    const content = item.fullContent || item.title;
+    
     console.log('News item selected:', { item, content });
     
     // Ensure we're passing non-empty values
-    if (item.title.trim()) {
-      onSelectTopic(item.title.trim(), content.trim());
+    if (content.trim()) {
+      onSelectTopic(item.title.trim(), content);
       setSelectedItemIndex(index);
 
       // Track when a news item is selected
@@ -148,13 +150,15 @@ const NewsSection: React.FC<NewsSectionProps> = ({ onSelectTopic }) => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      // Track search attempt
-      track("news_search", {
-        query: searchQuery
-      });
-      fetchDdgNews(searchQuery);
-    }
+    
+    // Track search attempt even if empty
+    track("news_search", {
+      query: searchQuery,
+      isEmpty: !searchQuery.trim()
+    });
+
+    // Always call fetchDdgNews - it will handle empty queries internally
+    fetchDdgNews(searchQuery);
   };
 
   const handleRefresh = () => {
@@ -314,7 +318,13 @@ const NewsSection: React.FC<NewsSectionProps> = ({ onSelectTopic }) => {
                 Search
               </Button>
             </form>
-            {renderNewsItems(ddgNews, isDdgLoading, ddgError)}
+            {searchQuery.trim() === "" && ddgNews.length === 0 ? (
+              <div className="text-default-500 text-sm p-4 text-center border border-default-200 rounded-lg">
+                Enter a search term to find relevant articles
+              </div>
+            ) : (
+              renderNewsItems(ddgNews, isDdgLoading, ddgError)
+            )}
           </div>
         </Tab>
       </Tabs>

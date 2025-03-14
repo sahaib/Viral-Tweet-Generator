@@ -24,25 +24,31 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic, external
   useEffect(() => {
     console.log('External values changed:', { externalTopic, externalContent });
     
-    // Update topic immediately if provided
-    if (externalTopic) {
-      console.log('Setting topic to:', externalTopic);
-      setTopic(externalTopic);
-      // Track when a topic is selected from news
-      track("topic_selected_from_news", {
-        topic: externalTopic,
-        hasContent: !!externalContent
+    if (externalTopic || externalContent) {
+      // Update topic if provided
+      if (externalTopic) {
+        console.log('Setting topic to:', externalTopic);
+        setTopic(externalTopic);
+      }
+
+      // Update content if provided
+      if (externalContent) {
+        console.log('Setting content to:', externalContent);
+        setFullContent(externalContent);
+        // Automatically trigger tweet generation with new content
+        handleGenerateTweet(externalTopic || topic, externalContent);
+      }
+
+      // Track when content is received from news
+      track("content_received_from_news", {
+        topic: externalTopic || '',
+        hasContent: !!externalContent,
+        contentLength: externalContent?.length || 0
       });
-    }
 
-    // Update content immediately if provided
-    if (externalContent) {
-      console.log('Setting content to:', externalContent);
-      setFullContent(externalContent);
+      // Clear error if any
+      setError(null);
     }
-
-    // Clear error if any
-    setError(null);
   }, [externalTopic, externalContent]);
 
   // Reset states when component unmounts
@@ -55,9 +61,13 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic, external
     };
   }, []);
 
-  const handleGenerateTweet = async () => {
-    console.log('Generating tweet with:', { topic, fullContent });
-    if (!topic.trim()) {
+  const handleGenerateTweet = async (currentTopic?: string, currentContent?: string) => {
+    const topicToUse = currentTopic || topic;
+    const contentToUse = currentContent || fullContent;
+
+    console.log('Generating tweet with:', { topicToUse, contentToUse });
+    
+    if (!topicToUse.trim()) {
       setError("Please enter a topic");
       return;
     }
@@ -69,9 +79,9 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic, external
     try {
       // Track tweet generation attempt
       track("tweet_generation_started", {
-        topic: topic,
+        topic: topicToUse,
         useGroq: useGroq,
-        hasContent: !!fullContent
+        hasContent: !!contentToUse
       });
 
       const apiUrl = "/api/generate-tweet";
@@ -82,8 +92,8 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic, external
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          topic,
-          fullContent: fullContent || undefined,
+          topic: topicToUse,
+          fullContent: contentToUse || undefined,
           useGroq,
         }),
       });
@@ -95,7 +105,7 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic, external
       if (!response.ok) {
         // Track generation error
         track("tweet_generation_error", {
-          topic: topic,
+          topic: topicToUse,
           error: data.error,
           details: data.details
         });
@@ -120,12 +130,14 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic, external
 
       // Track successful generation
       track("tweet_generation_success", {
-        topic: topic,
+        topic: topicToUse,
         useGroq: useGroq,
-        tweetLength: data.tweet.length
+        tweetLength: data.tweet.length,
+        hasContent: !!contentToUse
       });
 
     } catch (err) {
+      console.error("Tweet generation error:", err);
       const errorMessage = err instanceof Error ? err.message : "Failed to generate tweet. Please try again.";
       setError(errorMessage);
     } finally {
@@ -187,7 +199,7 @@ const TweetGenerator: React.FC<TweetGeneratorProps> = ({ externalTopic, external
           isLoading={isLoading}
           radius="sm"
           variant="shadow"
-          onClick={handleGenerateTweet}
+          onClick={() => handleGenerateTweet()}
         >
           {isLoading ? "Generating..." : "Generate Tweet"}
         </Button>

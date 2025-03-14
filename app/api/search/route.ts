@@ -5,9 +5,14 @@ const NEWS_API_KEY = process.env.NEWS_API_KEY || "d049a509c1b54e1c8f7d6f4a2f1f3e
 
 async function searchNews(query: string) {
   try {
+    // Return empty results for empty or whitespace-only queries
+    if (!query || !query.trim()) {
+      return { articles: [] };
+    }
+
     const response = await fetch(
       `https://newsapi.org/v2/everything?` +
-      `q=${encodeURIComponent(query)}&` +
+      `q=${encodeURIComponent(query.trim())}&` +
       `sortBy=relevancy&` +
       `language=en&` +
       `pageSize=10`,
@@ -68,11 +73,12 @@ export async function POST(req: Request) {
   try {
     const { searchTerm } = await req.json();
 
-    if (!searchTerm) {
-      return NextResponse.json(
-        { error: "Search term is required" },
-        { status: 400 }
-      );
+    // Return empty results for empty or whitespace-only search terms
+    if (!searchTerm || !searchTerm.trim()) {
+      return NextResponse.json({
+        articles: [],
+        enhancement: null
+      });
     }
 
     // Get search results from News API
@@ -82,15 +88,28 @@ export async function POST(req: Request) {
     const enhancement = await enhanceWithGroq(searchResults);
 
     // Transform results to match our expected format
-    const transformedResults = searchResults.articles.map((article: any) => ({
-      title: article.title,
-      url: article.url,
-      snippet: article.description,
-      source: {
-        name: article.source.name,
-      },
-      publishedAt: article.publishedAt,
-    }));
+    const transformedResults = searchResults.articles.map((article: any) => {
+      // Extract the full content from the article
+      const fullContent = [
+        article.title,
+        article.description,
+        article.content?.split('[+')[0]?.trim(),
+        `Source: ${article.source.name}`
+      ].filter(Boolean).join('\n\n');
+
+      return {
+        title: article.title,
+        url: article.url,
+        snippet: article.description,
+        source: {
+          name: article.source.name,
+        },
+        publishedAt: article.publishedAt,
+        author: article.author || article.source.name,
+        // Add full content for tweet generation (same pattern as Athina AI Hub)
+        fullContent: fullContent
+      };
+    });
 
     return NextResponse.json({
       articles: transformedResults,
